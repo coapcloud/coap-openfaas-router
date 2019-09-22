@@ -1,11 +1,11 @@
 # Gateway - POC
 
-# To Compile and Run
+### To Compile and Run
 - `make`
 
-# To Just Compile
+### To Just Compile
 - `make build`
 
-# To Just Run
+### To Just Run
 - `make run`
 
