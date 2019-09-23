@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	coap "github.com/go-ocf/go-coap"
+	coap "github.com/coapcloud/go-coap"
 	flag "github.com/spf13/pflag"
 )
 
@@ -24,8 +24,11 @@ func main() {
 	flag.StringVarP(&openfaasAddress, "addr", "a", openfaasAddress, "openfaas gateway address")
 	flag.Parse()
 
+	r := NewRouter()
+	registerRoutes(&r, routes)
+
 	mux := coap.NewServeMux()
-	registerRoutes(mux, routes)
+	mux.Handle("*", r)
 
 	fmt.Printf("serving CoAP requests on %d\n", *port)
 	log.Fatal(coap.ListenAndServe("udp", fmt.Sprintf(":%d", *port), mux))
@@ -50,13 +53,8 @@ var routes = map[string][]routeTuple{
 	},
 }
 
-func registerRoutes(mux *coap.ServeMux, routes map[string][]routeTuple) {
-	r := NewRouter()
-
-	// this still does not support multiple verbs at the same route, will update
+func registerRoutes(r *Router, routes map[string][]routeTuple) {
 	for k, routeTuples := range routes {
-		mux.Handle(k, r) // need to fork to allow a wildcard route so we don't have to do this
-
 		for _, v := range routeTuples {
 			r.registerRoute(v.Verb, k, v.FuncName)
 		}

@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"time"
 
+	coap "github.com/coapcloud/go-coap"
 	"github.com/derekparker/trie"
-	coap "github.com/go-ocf/go-coap"
 )
 
 // Router Root-Level Router
