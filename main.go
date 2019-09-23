@@ -15,10 +15,9 @@ var (
 
 // add flags to register routes too (plumb through to openfaas)
 
-type routeTriple struct {
+type routeTuple struct {
 	FuncName string
 	Verb     coap.COAPCode
-	Type     coap.COAPType
 }
 
 func main() {
@@ -26,37 +25,40 @@ func main() {
 	flag.Parse()
 
 	mux := coap.NewServeMux()
-
 	registerRoutes(mux, routes)
 
 	fmt.Printf("serving CoAP requests on %d\n", *port)
 	log.Fatal(coap.ListenAndServe("udp", fmt.Sprintf(":%d", *port), mux))
 }
 
-var routes = map[string][]routeTriple{
-	"add": []routeTriple{
-		routeTriple{
+var routes = map[string][]routeTuple{
+	"add": []routeTuple{
+		routeTuple{
+			Verb:     coap.GET,
+			FuncName: "sum",
+		},
+		routeTuple{
 			Verb:     coap.POST,
-			Type:     coap.NonConfirmable,
 			FuncName: "add",
 		},
 	},
-	"go-fn": []routeTriple{
-		routeTriple{
+	"go-fn": []routeTuple{
+		routeTuple{
 			Verb:     coap.GET,
-			Type:     coap.NonConfirmable,
 			FuncName: "go-fn",
 		},
 	},
 }
 
-func registerRoutes(mux *coap.ServeMux, routes map[string][]routeTriple) {
+func registerRoutes(mux *coap.ServeMux, routes map[string][]routeTuple) {
+	r := NewRouter()
+
 	// this still does not support multiple verbs at the same route, will update
-	for k, rr := range routes {
-		for _, v := range rr {
-			mux.Handle(k, faasHandler{OpenFaasFuncID: openfaasCallback(v.FuncName), Code: v.Verb, Type: v.Type})
+	for k, routeTuples := range routes {
+		mux.Handle(k, r) // need to fork to allow a wildcard route so we don't have to do this
+
+		for _, v := range routeTuples {
+			r.registerRoute(v.Verb, k, v.FuncName)
 		}
 	}
-
-	fmt.Printf("registering routes: %v\n", routes)
 }

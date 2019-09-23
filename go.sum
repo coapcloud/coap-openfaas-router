@@ -1,5 +1,7 @@
 github.com/coapcloud/gateway-poc v0.0.0-20190922184016-1a86ce17eaa5 h1:OohhnUP/jj9q2A3xWnloZydYBIGwJqygDPBKJi3HSEE=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/derekparker/trie v0.0.0-20190812220523-e66023ee76eb h1:HGjKnH6D1WD8sc9SfCkWkeD4OteWPPXD+ayJY+P1Bgk=
+github.com/derekparker/trie v0.0.0-20190812220523-e66023ee76eb/go.mod h1:D6ICZm05D9VN1n/8iOtBxLpXtoGp6HDFUJ1RNVieOSE=
 github.com/go-ocf/go-coap v0.0.0-20190920092904-4e2ec3636256 h1:vGQc+dABH+JavpJ/2d2wzzpDovoSscDwRYnec80p8cc=
 github.com/go-ocf/go-coap v0.0.0-20190920092904-4e2ec3636256/go.mod h1:BfsrAO44kduYzuyPp+993pDv4n3TkFjVVShIIo7k3/U=
 github.com/pion/dtls v1.5.1 h1:LcCs1l9fzsHC4y+ENjLyuxOAe+k0DV65T2n4tjwM7xw=
