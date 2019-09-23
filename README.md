@@ -6,6 +6,8 @@
 ### To Just Compile
 - `make build`
 
-### To Just Run
+### To Run with defaults
 - `make run`
 
+### CLI flags
+- ./server -a {OPENFAAS_GATEWAY_ADDRESS} -p {LOCAL_LISTEN_PORT}
