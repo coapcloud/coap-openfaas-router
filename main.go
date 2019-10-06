@@ -30,6 +30,9 @@ func main() {
 	mux := coap.NewServeMux()
 	mux.Handle("*", r)
 
+	fmt.Println("starting store sync")
+	go run(&r)
+
 	fmt.Printf("serving CoAP requests on %d\n", *port)
 	log.Fatal(coap.ListenAndServe("udp", fmt.Sprintf(":%d", *port), mux))
 }
