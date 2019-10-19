@@ -3,10 +3,12 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 
 	coap "github.com/coapcloud/go-coap"
@@ -16,12 +18,14 @@ import (
 // Router Root-Level Router
 type Router struct {
 	*trie.Trie
+	*sync.RWMutex
 }
 
 // NewRouter ...
 func NewRouter() Router {
 	return Router{
 		trie.New(),
+		&sync.RWMutex{},
 	}
 }
 
@@ -85,7 +89,67 @@ func (r *Router) registerRoute(verb coap.COAPCode, path, openfaasFuncID string) 
 	}
 }
 
+func (r *Router) HotRegisterRoute(verb coap.COAPCode, path, openfaasFuncID string) {
+	r.Lock()
+	defer r.Unlock()
+
+	key := routeKey(verb, path)
+
+	log.Printf("registering route: %v %v -> openfaas func: %s\n", verb.String(), path, openfaasFuncID)
+
+	node := r.Add(key, openfaasFuncID)
+	if node != nil {
+		log.Printf("registered route: %s /%s to func %q\n", verb.String(), path, openfaasFuncID)
+	}
+}
+
+func (r *Router) HotModifyRoute(verb coap.COAPCode, path, openfaasFuncID string) error {
+	r.Lock()
+	defer r.Unlock()
+
+	key := routeKey(verb, path)
+
+	_, ok := r.Find(key)
+	if !ok {
+		return errors.New("could not find route")
+	}
+
+	log.Printf("deregistering route: %v %v -> openfaas func: %s\n", verb.String(), path, openfaasFuncID)
+
+	r.Remove(key)
+
+	log.Printf("registering route: %v %v -> openfaas func: %s\n", verb.String(), path, openfaasFuncID)
+
+	node := r.Add(key, openfaasFuncID)
+	if node != nil {
+		log.Printf("registered route: %s /%s to func %q\n", verb.String(), path, openfaasFuncID)
+	}
+
+	return nil
+}
+
+func (r *Router) HotDeRegisterRoute(verb coap.COAPCode, path, openfaasFuncID string) error {
+	r.Lock()
+	defer r.Unlock()
+
+	key := routeKey(verb, path)
+
+	_, ok := r.Find(key)
+	if !ok {
+		return errors.New("could not find route")
+	}
+
+	log.Printf("deregistering route: %v %v -> openfaas func: %s\n", verb.String(), path, openfaasFuncID)
+
+	r.Remove(key)
+
+	return nil
+}
+
 func (r *Router) match(verb coap.COAPCode, path string) (string, bool) {
+	r.RLock()
+	defer r.RUnlock()
+
 	key := routeKey(verb, path)
 
 	fmt.Println(key)
