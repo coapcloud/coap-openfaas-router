@@ -11,6 +11,6 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/pion/dtls v1.5.1 // indirect
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/net v0.0.0-20190921015927-1a5e07d1ff72
+	golang.org/x/net v0.7.0
 	google.golang.org/api v0.10.0
 )
